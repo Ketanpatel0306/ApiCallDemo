@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Button, Table } from "react-bootstrap";
+import _ from "lodash";
 
 export const Clear = () => {
   const vaccineGRef = useRef(null);
@@ -11,6 +12,9 @@ export const Clear = () => {
   const [minVaccinatedValue, setMinVaccinatedValue] = useState(0);
   const [greaterVaccine, setGreaterVaccine] = useState(0);
   const [LessVaccine, setLessVaccine] = useState(0);
+  const [lessRecovered, setLessRecovered] = useState(0);
+  const [greaterThenRecovered, setGreaterThenRecovered] = useState(0);
+  const [minRecoveredValue, setMinRecoveredValue] = useState(0);
 
   const CovidDataFetch = async () => {
     const Data = await fetch(
@@ -20,9 +24,12 @@ export const Clear = () => {
 
     let array = [];
     let minVaccinated = 0;
+    let minRecovered = 0;
+
     Object.keys(Response).map((State) => {
       "districts" in Response[State] &&
         Object.keys(Response[State].districts).map((Districts) => {
+          // console.log(Response, "Districts");
           let vaccinated =
             Response[State].districts[Districts]?.total?.vaccinated1;
           let Recovered =
@@ -47,11 +54,14 @@ export const Clear = () => {
           };
           minVaccinated =
             minVaccinated <= vaccinated ? vaccinated : minVaccinated;
+          minRecovered = minRecovered <= Recovered ? Recovered : minRecovered;
           array.push(Object);
         });
     });
     setMinVaccinatedValue(minVaccinated);
+    setMinRecoveredValue(minRecovered);
     setStoreData(array);
+
     setFilterData(array);
   };
 
@@ -66,6 +76,7 @@ export const Clear = () => {
   useEffect(() => {
     CovidError();
   }, []);
+  ///////-------------------------------------    Filter start     ------------------------------------////
 
   ///////-------------------------------------   state Filter     ------------------------------------////
   const FilterState = (a, b) => {
@@ -83,11 +94,19 @@ export const Clear = () => {
   const SortByVaccinated = (data) => {
     return data.sort((a, b) => a.vaccinated - b.vaccinated);
   };
+  ///////-------------------------------------   Sort For Recovered    ------------------------------------////
+  const SortByRecovered = (data) => {
+    return data.sort((a, b) => a.Recovered - b.Recovered);
+  };
+
+  ///////-------------------------------------   End Filter    ------------------------------------////\
+
+  ///////-------------------------------------  start  Button    ------------------------------------////
 
   const clickMe = (change, update) => {
-    let state = [];
+    let state = filterData;
     let isError = false;
-    ///////-------------------------------------   state Change     ------------------------------------////
+    ///////-------------------------------------   {state} Change     ------------------------------------////
     let stateValue =
       update == "StateClick" ? change.trim() : stateFilter.trim();
     if (!/[^a-zA-Z]/.test(stateValue)) {
@@ -102,7 +121,6 @@ export const Clear = () => {
 
     ///////-------------------------------------   Vaccine Change     ------------------------------------////
 
-    console.log("AA SU CHE",LessVaccine,greaterVaccine)
     let VaccineGreater =
       update == "VaccineGreater"
         ? parseInt(change.trim())
@@ -115,27 +133,57 @@ export const Clear = () => {
         : LessVaccine == ""
         ? minVaccinatedValue
         : LessVaccine;
-    console.log("SU CHE",LessGreater,VaccineGreater)
     if (LessGreater >= VaccineGreater) {
       vaccineGRef.current.style.borderColor = "black";
       if (!/[^0-9]/.test(VaccineGreater)) {
-        state = state.filter(
-          (item, index) => item.vaccinated >= VaccineGreater
-        );
-        state = state.filter((item, index) => LessGreater > item.vaccinated);
-        if(change){
-            state = SortByVaccinated(state);
+        state = state.filter((item) => item.vaccinated >= VaccineGreater);
+        state = state.filter((item) => LessGreater > item.vaccinated);
+        if (change) {
+          state = SortByVaccinated(state);
         }
       }
     } else {
       vaccineGRef.current.style.borderColor = "red";
       isError = true;
-    //   alert("KHOTI KHOTI VALUE");
+      alert("KHOTI KHOTI VALUE");
     }
-    !isError && 
+
+    ///////-------------------------------------   Recovered Change     ------------------------------------////
+    if (update == "LessRecovered") {
+      setLessRecovered(change != "" ? parseInt(change) : 0);
+    }
+    if (update == "GreaterRecovered") {
+      setGreaterThenRecovered(change != "" ? parseInt(change) : 0);
+    }
+    let GreaterRecovered =
+      update == "GreaterRecovered"
+        ? parseInt(change.trim())
+        : greaterThenRecovered == ""
+        ? 0
+        : greaterThenRecovered;
+    let LessRecovered =
+      update == "LessRecovered"
+        ? parseInt(change.trim())
+        : lessRecovered == ""
+        ? minRecoveredValue
+        : lessRecovered;
+    if (LessRecovered >= GreaterRecovered) {
+      // console.log(change, "change");
+      if (!/[^0-9]/.test(GreaterRecovered)) {
+        state = state.filter((item) => item.Recovered >= GreaterRecovered);
+        state = state.filter((item) => LessRecovered > item.Recovered);
+        if (change) {
+          state = SortByRecovered(state);
+        }
+      }
+    } else {
+      alert("KHOTI KHOTI VALUE");
+    }
+    console.log(state.length, "Lenght");
     setStoreData(state);
   };
 
+  ///////-------------------------------------  End  Button    ------------------------------------////
   return (
     <div style={{ padding: "0px 10%", marginTop: "10%" }}>
       <Table striped bordered hover>
@@ -169,12 +217,11 @@ export const Clear = () => {
                 type="text"
                 onChange={(e) => {
                   setLessVaccine(
-                    e.target.value 
-                    != "" ? parseInt(e.target.value) : 0
+                    e.target.value != "" ? parseInt(e.target.value) : 0
                   );
                   clickMe(e.target.value, "VaccineLess");
                 }}
-              />{" "}
+              />
               <br />
               {"> vaccinated <"} <br />
               <input
@@ -183,14 +230,31 @@ export const Clear = () => {
                 type="text"
                 onChange={(e) => {
                   setGreaterVaccine(
-                    e.target.value 
-                    != "" ? parseInt(e.target.value) : 0
+                    e.target.value != "" ? parseInt(e.target.value) : 0
                   );
                   clickMe(e.target.value, "VaccineGreater");
                 }}
               />
             </th>
-            <th>recovered</th>
+            <th>
+              <input
+                type="number"
+                placeholder="Less"
+                onChange={_.debounce((e) => {
+                  clickMe(e.target.value, "LessRecovered");
+                }, 500)}
+              />
+              <br />
+              {" > recovered <"}
+              <br />
+              <input
+                type="number"
+                placeholder="Greater"
+                onChange={_.debounce((e) => {
+                  clickMe(e.target.value, "GreaterRecovered");
+                }, 500)}
+              />
+            </th>
             <th>confirmed</th>
           </tr>
           <Button

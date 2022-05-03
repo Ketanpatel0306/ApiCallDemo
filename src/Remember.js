@@ -5,8 +5,8 @@ export const Remember = () => {
   const [newData, setNewData] = useState([])
   const [state, setState] = useState("")
   const [stateCity, setStateCity] = useState("")
-  const [vaccine, setVaccine] = useState(0)
-  const [vaccine1, setVaccine1] = useState(0)
+  const [vaccine, setVaccine] = useState("")
+  const [vaccine1, setVaccine1] = useState("")
   const [recover, setRecover] = useState("")
   const [recover1, setRecover1] = useState("")
   const [confirms, setConfirms] = useState("")
@@ -15,7 +15,7 @@ export const Remember = () => {
   const [hideBtn2, setHideBtn2] = useState(false)
   const [hideBtn4, setHideBtn4] = useState(false)
   const [empty, setEmpty] = useState(false)
-  const [extra, setExtra] = useState(0)
+
 
 
 
@@ -86,12 +86,12 @@ export const Remember = () => {
     )
   }
   //   vaccinated  /////
-  let filterVaccine = (c) => {
+  let filterVaccine1 = (c) => {
     return c.filter(
       ((data2) => data2.vaccinated >= vaccine)
     )
   }
-  let filterVaccine1 = (c) => {
+  let filterVaccine = (c) => {
     return c.filter(
       ((data2) => data2.vaccinated <= vaccine1)
     )
@@ -126,71 +126,68 @@ export const Remember = () => {
   const HiltMe = (search, where) => {
 
     // const [input, setInput] = useState(false)
-    var abc = []
+
     //////    state    ////////
-    if (where == 'state') {
+    var abc = newData
+    if (where == "State") {
       var s = search.trim()
       if (!/[^a-zA-Z]/.test(s)) {
         abc = filterState(newData, s)
+
       } else {
         alert("plz enter valid value")
         return;
       }
-      setData(abc)
     }
+
+
+
 
 
     /////// City /////////
 
     if (where == 'city') {
-      var def = []
+
       var s = search.trim()
       if (!/[^a-zA-Z]/.test(s)) {
-        def = filterCity(newData, s)
+        abc = filterCity(newData, s)
       } else {
         alert("plz enter valid value")
         return;
       }
-      setData(def)
+
     }
 
 
-    //   vaccinated  /////
-    if (vaccine != 0 && vaccine1 != 0) {
-      let a = vaccine
-      let b = vaccine1
-      let c = parseInt(a)
-      let d = parseInt(b)
-      let newArr = []
+    //  vaccinated  /////
+    if (where == "setVaccineGreater" && where == "setVaccineLess") {
+
+      let c = parseInt(search)
+      let d = parseInt(search)
       if (c <= d) {
-        newArr = def.filter((data) => data.vaccinated >= a && data.vaccinated <= b)
+        abc = newData.filter((data) => data.vaccinated >= search && data.vaccinated <= search)
       } else {
         alert("please enter valid data");
       }
-      setData(newArr)
+
     }
     else {
-      if (vaccine != 0) {
-
-        var vac = []
-        if (!/[^0-9]/.test(vaccine)) {
-          vac = filterVaccine(newData, vaccine)
+      if (where == "setVaccineGreater") {
+        if (!/[^0-9]/.test(search)) {
+          abc = filterVaccine(newData, search)
         } else {
           alert("Please Enter valid value");
           return;
         }
-        setData(vac)
-      } else if (vaccine1 != 0) {
-
-        var vac1 = []
-        if (!/[^0-9]/.test(vaccine1)) {
-          vac1 = filterVaccine1(newData, vaccine1)
+      } else if (where == "setVaccineLess") {
+        if (!/[^0-9]/.test(search)) {
+          abc = filterVaccine1(newData, search)
         }
         else {
           alert("Please Enter valid value");
           return;
         }
-        setData(vac1)
+
 
 
       }
@@ -201,33 +198,33 @@ export const Remember = () => {
       let b = recover1
       let c = parseInt(a)
       let d = parseInt(b)
-      let newArr = []
+
       if (c <= d) {
-        newArr = newData.filter((data) => data.recoverd >= a && data.recoverd <= b)
+        abc = newData.filter((data) => data.recoverd >= a && data.recoverd <= b)
       } else {
         alert("please enter valid data");
       }
-      setData(newArr)
+
 
     } else {
       if (recover != 0) {
-        var rec = []
+
         if (!/[^0-9]/.test(recover)) {
-          rec = filterRecovered(newData, recover)
+          abc = filterRecovered(newData, recover)
         } else {
           alert("Please Enter valid value");
           return;
         }
-        setData(rec)
+
       } else if (recover1 != 0) {
-        var rec1 = []
+
         if (!/[^0-9]/.test(recover1)) {
-          rec1 = filterRecovered1(newData, recover1)
+          abc = filterRecovered1(newData, recover1)
         } else {
           alert("Please Enter valid value");
           return;
         }
-        setData(rec1)
+
       }
 
     }
@@ -238,42 +235,44 @@ export const Remember = () => {
       let b = confirms1
       let c = parseInt(a)
       let d = parseInt(b)
-      let newArrr = []
+
       if (c <= d) {
-        newArrr = newData.filter((data1) => data1.confirmed >= a && data1.confirmed <= b)
+        abc = newData.filter((data1) => data1.confirmed >= a && data1.confirmed <= b)
       }
       else {
         alert("please enter valid data");
       }
-      setData(newArrr)
+
     } else {
       if (confirms != 0) {
-        var con = []
         if (!/[^0-9]/.test(confirms)) {
-          con = filterConfirmed(newData, confirms)
+          abc = filterConfirmed(newData, confirms)
         } else {
           alert("Please Enter Valid Value")
           return;
         }
-        setData(con)
+
       } else if (confirms1 != 0) {
-        var con1 = []
+
         if (!/[^0-9]/.test(confirms)) {
-          con1 = filterConfirmed1(newData, confirms)
+          abc = filterConfirmed1(newData, confirms)
         } else {
           alert("Please Enter Valid Value")
           return;
         }
-        setData(con1)
+
       }
     }
+    setData(abc)
+
+
   }
 
 
 
 
 
-  // vacation assenting - dissenting
+
 
 
 
@@ -353,8 +352,7 @@ export const Remember = () => {
             <input required type="text" placeholder='State'
               onChange={(event) => {
                 setState(event.target.value)
-                setEmpty(false)
-                HiltMe(event.target.value, 'state')
+                HiltMe(event.target.value, "State")
                 // var abc = []
                 // var s = event.target.value.trim()
                 // if (!/[^a-zA-Z]/.test(s)) {
@@ -366,36 +364,36 @@ export const Remember = () => {
                 // setData(abc)
               }} />
             <br />
-            {empty && <span>hello</span>}
+
           </th>
           <th>
-            <input type="text" required placeholder='City'
+            <input type="text" placeholder='City'
               onChange={(event) => {
                 setStateCity(event.target.value)
                 HiltMe(event.target.value, 'city')
               }} />
           </th>
           <th>
-            <input type="number" placeholder='greater' required style={{ marginBottom: '10px' }}
+            <input type="number" placeholder='setVaccineGreater' required style={{ marginBottom: '10px' }}
               onChange={(event) => {
                 setVaccine(event.target.value)
-                HiltMe(event.target.value)
+                HiltMe(event.target.value, "setVaccineGreater")
 
               }} />
-            <input type="number" required placeholder='less' onChange={(event) => {
+            <input type="number" placeholder='setVaccineLess' onChange={(event) => {
               setVaccine1(event.target.value)
-              HiltMe(event.target.value)
+              HiltMe(event.target.value, "setVaccineLess")
 
             }} />
           </th>
           <th>
-            <input type="number" required placeholder='gether' style={{ marginBottom: '10px' }}
+            <input type="number" placeholder='setRecoverGether' style={{ marginBottom: '10px' }}
               onChange={(event) => {
                 setRecover(event.target.value)
                 HiltMe(event.target.value)
 
               }} />
-            <input type="number" required placeholder='less'
+            <input type="number" placeholder='setRecover1Less'
               onChange={(event) => {
                 setRecover1(event.target.value)
                 HiltMe(event.target.value)
@@ -403,15 +401,15 @@ export const Remember = () => {
               }} />
           </th>
           <th>
-            <input type="number" required placeholder='gether' style={{ marginBottom: '10px' }}
+            <input type="number" placeholder='gether' style={{ marginBottom: '10px' }}
               onChange={(e) => {
                 setConfirms(e.target.value)
-                HiltMe(e.target.value, "gether")
+                HiltMe(e.target.value)
               }} />
-            <input type="number" required placeholder='less'
+            <input type="number" placeholder='less'
               onChange={(e) => {
                 setConfirms1(e.target.value)
-                HiltMe(e.target.value, "less")
+                HiltMe(e.target.value)
               }} />
           </th>
         </tr>
