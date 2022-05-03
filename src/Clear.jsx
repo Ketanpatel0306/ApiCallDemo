@@ -15,16 +15,23 @@ export const Clear = () => {
   const [lessRecovered, setLessRecovered] = useState(0);
   const [greaterThenRecovered, setGreaterThenRecovered] = useState(0);
   const [minRecoveredValue, setMinRecoveredValue] = useState(0);
+  const [greaterThenConfirmed, setGreaterThenConfirmed] = useState(0);
+  const [lessThenConfirmed, setLessThenConfirmed] = useState(0);
+  const [minConfirmedValue, setMinConfirmedValue] = useState(0);
 
   const CovidDataFetch = async () => {
     const Data = await fetch(
       "https://data.covid19india.org/v4/min/data.min.json"
     );
+
+    // console.log(Data, "Data loggg");
     const Response = await Data.json();
+    // console.log(Response, "Response");
 
     let array = [];
     let minVaccinated = 0;
     let minRecovered = 0;
+    let minConfirmed = 0;
 
     Object.keys(Response).map((State) => {
       "districts" in Response[State] &&
@@ -55,13 +62,14 @@ export const Clear = () => {
           minVaccinated =
             minVaccinated <= vaccinated ? vaccinated : minVaccinated;
           minRecovered = minRecovered <= Recovered ? Recovered : minRecovered;
+          minConfirmed = minConfirmed <= Confirmed ? Confirmed : minConfirmed;
           array.push(Object);
         });
     });
     setMinVaccinatedValue(minVaccinated);
     setMinRecoveredValue(minRecovered);
+    setMinConfirmedValue(minConfirmed);
     setStoreData(array);
-
     setFilterData(array);
   };
 
@@ -98,6 +106,10 @@ export const Clear = () => {
   const SortByRecovered = (data) => {
     return data.sort((a, b) => a.Recovered - b.Recovered);
   };
+  ///////-------------------------------------   Sort For Confirmed    ------------------------------------////
+  const SortByConfirmed = (data) => {
+    return data.sort((a, b) => a.Confirmed - b.Confirmed);
+  };
 
   ///////-------------------------------------   End Filter    ------------------------------------////\
 
@@ -120,7 +132,12 @@ export const Clear = () => {
     }
 
     ///////-------------------------------------   Vaccine Change     ------------------------------------////
-
+    if (update == "VaccineGreater") {
+      setGreaterVaccine(change != "" ? parseInt(change) : 0);
+    }
+    if (update == "VaccineLess") {
+      setLessVaccine(change != "" ? parseInt(change) : 0);
+    }
     let VaccineGreater =
       update == "VaccineGreater"
         ? parseInt(change.trim())
@@ -145,7 +162,7 @@ export const Clear = () => {
     } else {
       vaccineGRef.current.style.borderColor = "red";
       isError = true;
-      alert("KHOTI KHOTI VALUE");
+      alert("Invalid Value");
     }
 
     ///////-------------------------------------   Recovered Change     ------------------------------------////
@@ -168,7 +185,6 @@ export const Clear = () => {
         ? minRecoveredValue
         : lessRecovered;
     if (LessRecovered >= GreaterRecovered) {
-      // console.log(change, "change");
       if (!/[^0-9]/.test(GreaterRecovered)) {
         state = state.filter((item) => item.Recovered >= GreaterRecovered);
         state = state.filter((item) => LessRecovered > item.Recovered);
@@ -177,9 +193,38 @@ export const Clear = () => {
         }
       }
     } else {
-      alert("KHOTI KHOTI VALUE");
+      alert("Invalid Value");
     }
-    console.log(state.length, "Lenght");
+    ///////-------------------------------------   Confirmed Change     ------------------------------------////
+    if (update == "GreaterConfirmed") {
+      setGreaterThenConfirmed(change != "" ? parseInt(change) : 0);
+    }
+    if (update == "LessConfirmed") {
+      setLessThenConfirmed(change != "" ? parseInt(change) : 0);
+    }
+    let GreaterConfirmed =
+      update == "GreaterConfirmed"
+        ? parseInt(change.trim())
+        : greaterThenConfirmed == ""
+        ? 0
+        : greaterThenConfirmed;
+    let LessConfirmed =
+      update == "LessConfirmed"
+        ? parseInt(change.trim())
+        : lessThenConfirmed == ""
+        ? minConfirmedValue
+        : lessThenConfirmed;
+    if (LessConfirmed >= GreaterConfirmed) {
+      if (!/[^0-9]/.test(GreaterConfirmed)) {
+        state = state.filter((item) => item.Confirmed >= GreaterConfirmed);
+        state = state.filter((item) => LessConfirmed > item.Confirmed);
+        if (change) {
+          state = SortByConfirmed(state);
+        }
+      }
+    } else {
+      alert("Invalid Value");
+    }
     setStoreData(state);
   };
 
@@ -213,27 +258,21 @@ export const Clear = () => {
             <th>
               <input
                 ref={vaccineLRef}
-                placeholder="less"
+                placeholder="Less"
                 type="text"
-                onChange={(e) => {
-                  setLessVaccine(
-                    e.target.value != "" ? parseInt(e.target.value) : 0
-                  );
+                onChange={_.debounce((e) => {
                   clickMe(e.target.value, "VaccineLess");
-                }}
+                })}
               />
               <br />
               {"> vaccinated <"} <br />
               <input
                 ref={vaccineGRef}
-                placeholder="greater"
+                placeholder="Greater"
                 type="text"
-                onChange={(e) => {
-                  setGreaterVaccine(
-                    e.target.value != "" ? parseInt(e.target.value) : 0
-                  );
+                onChange={_.debounce((e) => {
                   clickMe(e.target.value, "VaccineGreater");
-                }}
+                })}
               />
             </th>
             <th>
@@ -255,7 +294,26 @@ export const Clear = () => {
                 }, 500)}
               />
             </th>
-            <th>confirmed</th>
+
+            <th>
+              <input
+                type="number"
+                placeholder="Less"
+                onChange={_.debounce((e) => {
+                  clickMe(e.target.value, "LessConfirmed");
+                }, 500)}
+              />
+              <br />
+              {"> confirmed <"}
+              <br />
+              <input
+                type="number"
+                placeholder="Greater"
+                onChange={_.debounce((e) => {
+                  clickMe(e.target.value, "GreaterConfirmed");
+                }, 500)}
+              />
+            </th>
           </tr>
           <Button
             type="submit"
@@ -279,7 +337,7 @@ export const Clear = () => {
               );
             })
           ) : (
-            <div>kasu nahi</div>
+            <div>Data not Found</div>
           )}
         </tbody>
       </Table>

@@ -208,7 +208,6 @@ export const Remember = () => {
 
     } else {
       if (recover != 0) {
-
         if (!/[^0-9]/.test(recover)) {
           abc = filterRecovered(newData, recover)
         } else {
@@ -419,21 +418,25 @@ export const Remember = () => {
           </th>
         </tr>
         <tbody>
+          {data.length > null ? (
+            data.map((Item, k) => {
 
-          {data.map((Item, k) => {
+              return (
+                <tr key={k + "covid"} style={{ backgroundColor: k % 2 == 0 ? "#EBCAC3" : "#C6E8B2" }}>
 
-            return (
-              <tr key={k + "covid"} style={{ backgroundColor: k % 2 == 0 ? "#EBCAC3" : "#C6E8B2" }}>
+                  <td>{Item.state}</td>
+                  <td>{Item.city}</td>
+                  <td>{Item.vaccinated}</td>
+                  <td>{Item.recoverd}</td>
+                  <td>{Item.confirmed}</td>
 
-                <td>{Item.state}</td>
-                <td>{Item.city}</td>
-                <td>{Item.vaccinated}</td>
-                <td>{Item.recoverd}</td>
-                <td>{Item.confirmed}</td>
+                </tr>
+              )
+            })
+          ) : (
+            <div>Data Not Match</div>
+          )}
 
-              </tr>
-            )
-          })}
 
         </tbody>
       </table>

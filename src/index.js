@@ -9,10 +9,12 @@ import Practice from "./Practice";
 import NewData from "./NewData";
 import Meee from "./New";
 import Imp from "./Imp";
-import Api from "./Api";
+
 import { Remember } from "./Remember";
 import { From } from "./From";
 import { Clear } from "./Clear";
+import { Same } from "./Same";
+
 
 ReactDOM.render(
   <React.StrictMode>
@@ -21,8 +23,9 @@ ReactDOM.render(
     {/* <Ind /> */}
     {/* <Api /> */}
     {/* <Imp /> */}
-    {/* <Remember /> */}
+    {/* <Remember  /> */}
     <Clear />
+    {/* <Same /> */}
     {/* <From /> */}
     {/* <NewData /> */}
     {/* <Practice /> */}
